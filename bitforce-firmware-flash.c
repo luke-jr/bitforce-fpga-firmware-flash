@@ -79,7 +79,8 @@ main(int argc, char**argv) {
 	printf("OK, sending...\n");
 	
 	// Actual firmware upload
-	for (long i = 0, j = 0; i < FWlen; ++i)
+	long i, j;
+	for (i = 0, j = 0; i < FWlen; ++i)
 	{
 		myassert(1 == fread(&n8, sizeof(n8), 1, FW), 0x30, "Error reading data from firmware file\n");
 		if (5 == i % 6)
@@ -95,12 +96,14 @@ main(int argc, char**argv) {
 	}
 	printf("\r100%% complete :)\n");
 	myassert(1 == fwrite(">>>>>>>>", 8, 1, BFL), 0x3f, "Error sending upload-finished to device\n");
-	myassert(fgets(buf, sizeof(buf), BFL), 0x3f, "Error reading response from upload-finished\n");  \
-	myassert(!strcmp(buf, "DONE\n"), 0x3f, "Invalid response from upload-finished: %s%s", ERRRESP(buf));  \
+	myassert(fgets(buf, sizeof(buf), BFL), 0x3f, "Error reading response from upload-finished\n");
+	myassert(!strcmp(buf, "DONE\n"), 0x3f, "Invalid response from upload-finished: %s%s", ERRRESP(buf));
 	
 	// ZBX: Finish programming
 	printf("Waiting for device... ");
 	myassert(1 == fwrite("ZBX", 3, 1, BFL), 0x40, "Failed to issue ZBX command\n");
 	WAITFOROK(0x40, "ZBX");
-	printf("ALL DONE!\n");
+	printf("All done! Try mining to test the flash succeeded.\n");
+	
+	return 0;
 }
